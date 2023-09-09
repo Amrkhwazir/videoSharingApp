@@ -8,25 +8,25 @@ const userRouter = express.Router();
 userRouter.put("/:id", verifyToken, updateUser) 
 
 // delete user
-userRouter.delete("/:id", deleteUser)
+userRouter.delete("/:id", verifyToken, deleteUser)
 
 // get a user
 userRouter.get("/find/:id", getUser)
 
 // subscribe a user
-userRouter.put("/sub/:id", subscribeUser)
+userRouter.put("/sub/:id", verifyToken,  subscribeUser)
 
 
 // unsubscribe a user
-userRouter.put("/unsub/:id", unsubscribeUser)
+userRouter.put("/unsub/:id", verifyToken, unsubscribeUser)
 
 
 // like a video
-userRouter.put("/like/:videoId", likeVideo)
+userRouter.put("/like/:videoId", verifyToken, likeVideo)
 
 
 // dislike a video
-userRouter.put("/dislike/:videoId", dislikeVideo)
+userRouter.put("/dislike/:videoId", verifyToken, dislikeVideo)
 
 
 
