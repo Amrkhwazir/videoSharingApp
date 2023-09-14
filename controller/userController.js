@@ -1,5 +1,6 @@
 import { createError } from "../error.js"
 import User from "../models/User.js"
+import Video from "../models/Video.js"
 
 export const updateUser = async (req, res, next)=>{
     if(req.params.id === req.user.id){
@@ -49,8 +50,8 @@ try {
 }
 export const subscribeUser = async (req, res, next)=>{
 try {
-    await User.findById(req.user.id,{
-        $push: {subscribeUser: req.params.id}
+    await User.findByIdAndUpdate(req.user.id,{
+        $push: {subscribedChanel: req.params.id}
     })
     await User.findByIdAndUpdate(req.params.id,{
         $inc: {subscriber: 1},
@@ -63,9 +64,9 @@ try {
 export const unsubscribeUser = async (req, res, next)=>{
 try {
     try {
-        await User.findById(req.user.id,{
-            $pull: {subscribeUser: req.params.id}
-        })
+        await User.findByIdAndUpdate(req.user.id,{
+            $pull: {subscribedChanel: req.params.id},
+        });
         await User.findByIdAndUpdate(req.params.id,{
             $inc: {subscriber: -1},
         });
@@ -77,16 +78,30 @@ try {
     next(error)
 }
 }
+
 export const likeVideo = async (req, res, next)=>{
+    const id = req.user.id;
+    const videoId = req.params.videoId;
 try {
-    
+  await Video.findByIdAndUpdate(videoId,{
+    $addToSet: {likes:id},
+    $pull:{dislikes:id}
+  })
+  res.status(200).json("The video has been liked.")
 } catch (error) {
     next(error)
 }
 }
+
 export const dislikeVideo = async (req, res, next)=>{
+    const id = req.user.id;
+    const videoId = req.params.videoId;
 try {
-    
+    await Video.findByIdAndUpdate(videoId,{
+        $addToSet: {dislikeslikes: id},
+        $pull:{likes: id}
+      })
+      res.status(200).json("The video has been disliked.")
 } catch (error) {
     next(error)
 }

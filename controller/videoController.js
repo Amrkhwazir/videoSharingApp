@@ -94,17 +94,42 @@ try {
 // subscribe channel function
 export const subscribe = async (req, res, next)=>{
 try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.user.id);
     const subscribedChannels = user.subscribedChanel;
     
-    const list = Promise.all(
+    const list = await Promise.all(
         subscribedChannels.map((channel)=>{
-            return Video.find({userId: channelId})
+            return Video.find({userId: channel})
         })
         );
-        res.status(200).json(list)
+        res.status(200).json(list.flat().sort((a,b)=> b.createdAt - a.createdAt))
 } catch (error) {
         next(error)
     }
 }
 
+
+// get tags video function
+export const getByTags = async (req, res, next)=>{
+    const tags = req.query.tags.split(",")
+    // console.log(tags)
+    try {
+            const videos = await Video.find({tags:{$in: tags}}).limit(20);
+            res.status(200).json(videos)
+        } catch (error) {
+            next(error)
+        }
+    }
+    
+
+// get title video function
+export const getByTitle = async (req, res, next)=>{
+    const   query = req.query.q
+    try {
+            const videos = await Video.find({title: {$regex: query, $options: "i"}});
+            res.status(200).json(videos)
+        } catch (error) {
+            next(error)
+        }
+    }
+    
